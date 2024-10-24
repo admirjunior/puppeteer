@@ -87,3 +87,31 @@ async waitForSpecificRequest(page, urlPattern) {
         await page.waitForTimeout(1000);
     }
 //-----------------------------------------------------------------------------------------------------------------------------------------
+//Abrindo uma pagina popup
+async function openPage(page) {
+    // Espera 2 segundos para garantir que a página tenha tempo de carregar.
+    await page.waitForTimeout(2000);
+    
+    // Aguarda até que um alvo com a URL que contém '/example/page.php' esteja disponível, com um timeout de 5 segundos.
+    const target = await page.browser().waitForTarget(target => target.url().includes('/example/page.php'), {timeout: 5000});
+    
+    // Obtém a página associada ao alvo encontrado.
+    const pageView = await target.page();
+
+    // Define as dimensões da viewport da página para 1920x1080.
+    await pageView.setViewport({
+        width: 1920,
+        height: 1080,
+        deviceScaleFactor: 1,
+    });
+
+    // Leva a página para a frente, tornando-a a ativa.
+    await pageView.bringToFront();
+    
+    // Aguarda até que o estado do documento seja 'completo', indicando que a página foi carregada completamente.
+    await pageView.waitForFunction('document.readyState === "complete"');
+
+    // Retorna a instância da página que foi aberta.
+    return pageView;
+}
+//-----------------------------------------------------------------------------------------------------------------------------------------
